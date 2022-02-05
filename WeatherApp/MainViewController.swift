@@ -36,7 +36,13 @@ extension MainViewController: MainViewDelegate {
                 }
             } else {
                 if let city = countries.first {
-                    print(city.name + " " + city.country)
+                    print(city)
+                    Network.share.requestToApi(api: WeatherApi(lat: Int(city.lat), lon: Int(city.lon))) { (data: Weather) in
+                        let temp = Int(data.main.temp - 273.15)
+                        DispatchQueue.main.async {
+                            view.responceLabel.text = "Current temp = \(temp)"
+                        }
+                    }
                 }
             }
         }
