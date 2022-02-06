@@ -102,6 +102,13 @@ class MainView: UIView {
     @objc private func testTouched() {
         viewDelegate?.handleTouchedUpTestButton()
     }
+    
+    func selectHiddenTable(_ hide: Bool) {
+        UIView.animate(withDuration: 0.15) {
+            let firstView = self.cityNameStack.arrangedSubviews[1]
+            firstView.isHidden = hide
+        }
+    }
 }
 
 

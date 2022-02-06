@@ -33,9 +33,7 @@ class MainViewController: UIViewController {
                 let temp = String(format: "%.0f", data.main.temp - 273.15)
                 DispatchQueue.main.async {
                     if let view = self.view as? MainView {
-                        if !view.cityNameStack.arrangedSubviews[1].isHidden {
-                            view.cityNameStack.arrangedSubviews[1].isHidden = true
-                        }
+                        view.selectHiddenTable(true)
                         view.responceLabel.text = "Current temp = \(temp) °C"
                     }
                 }
@@ -53,7 +51,7 @@ extension MainViewController: MainViewDelegate {
             if self.citiesArray.count != 1 {
                 DispatchQueue.main.async {
                     view.dropDownTableView.reloadData()
-                    view.cityNameStack.arrangedSubviews[1].isHidden = false
+                    view.selectHiddenTable(false)
                 }
             } else {
                 if let city = self.citiesArray.first {
