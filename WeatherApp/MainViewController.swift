@@ -26,6 +26,33 @@ class MainViewController: UIViewController {
         if let view = view as? MainView {
             view.dropDownTableView.reloadData()
         }
+        self.hideKeyboardWhenTappedAround()
+//        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func hideKeyboard() {
+        view.endEditing(true)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        guard let view = view as? MainView else { return }
+        if let keyboardFrame =
+            notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey]
+            as? NSValue
+        {
+            let keyBoardHeight = keyboardFrame.cgRectValue.height
+            let bottomSpace = view.frame.height - (view.testButton.frame.origin.y + view.testButton.frame.height) - 16
+            
+            if bottomSpace < keyBoardHeight {
+                view.frame.origin.y -= keyBoardHeight - bottomSpace
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide() {
+        view.frame.origin.y = 0
     }
     
     func getTemperature(city: GeoCity) {
@@ -39,6 +66,9 @@ class MainViewController: UIViewController {
                 }
             }
         }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 // MARK: MainViewDelegate
 extension MainViewController: MainViewDelegate {
@@ -84,5 +114,17 @@ extension MainViewController: UITableViewDelegate {
         DispatchQueue.main.async {
             self.getTemperature(city: city)
         }
+    }
+}
+
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardView))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+
+    @objc func dismissKeyboardView() {
+        view.endEditing(true)
     }
 }
