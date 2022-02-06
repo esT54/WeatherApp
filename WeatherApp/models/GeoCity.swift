@@ -21,9 +21,11 @@ struct GeoCity: Decodable {
 
 extension GeoCity: Equatable, Hashable {
     static func == (lhs: GeoCity, rhs: GeoCity) -> Bool {
-        lhs.country == rhs.country
+        lhs.country == rhs.country &&
+        lhs.name == rhs.name
     }
     func hash(into hasher: inout Hasher) {
         hasher.combine(country)
+        hasher.combine(name)
     }
 }

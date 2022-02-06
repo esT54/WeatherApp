@@ -12,7 +12,8 @@ protocol MainViewDelegate {
 }
 
 class MainView: UIView {
-    var delegate: MainViewDelegate?
+    var viewDelegate: MainViewDelegate?
+//    var dropDownTableViewDelegate: UITableViewDelegate?
     
     let titleLabel: UILabel = {
         let result = UILabel()
@@ -38,11 +39,23 @@ class MainView: UIView {
     
     let testButton: UIButton = {
         let result = UIButton()
-//        result.titleLabel?.text = "Test"
         result.setTitle("Test", for: .normal)
         result.backgroundColor = .red
         result.translatesAutoresizingMaskIntoConstraints = false
         result.addTarget(self, action: #selector(testTouched), for: .touchUpInside)
+        return result
+    }()
+    
+    let dropDownTableView: UITableView = {
+        let result = UITableView(frame: .zero, style: .plain)
+        result.translatesAutoresizingMaskIntoConstraints = false
+        result.heightAnchor.constraint(equalToConstant: 130).isActive = true
+        return result
+    }()
+    
+    let cityNameStack: UIStackView = {
+        let result = UIStackView()
+        result.translatesAutoresizingMaskIntoConstraints = false
         return result
     }()
     
@@ -51,23 +64,35 @@ class MainView: UIView {
         
         backgroundColor = .systemBackground
         
+        cityNameStack.addArrangedSubview(cityNameTextField)
+        cityNameStack.addArrangedSubview(dropDownTableView)
+        cityNameStack.axis = .vertical
+        cityNameStack.spacing = 0
+        cityNameStack.translatesAutoresizingMaskIntoConstraints = false
+        cityNameStack.arrangedSubviews.first { view in
+            view is UITableView
+        }?.isHidden = true
+        
         self.addSubview(titleLabel)
-        self.addSubview(cityNameTextField)
+        self.addSubview(cityNameStack)
         self.addSubview(responceLabel)
         self.addSubview(testButton)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor, constant: 40),
             titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            cityNameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 40),
-            cityNameTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            cityNameTextField.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            responceLabel.topAnchor.constraint(equalTo: cityNameTextField.bottomAnchor, constant: 40),
+            
+            cityNameStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 40),
+            cityNameStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            cityNameStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            responceLabel.topAnchor.constraint(equalTo: cityNameStack.bottomAnchor, constant: 40),
             responceLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            
             testButton.topAnchor.constraint(equalTo: responceLabel.bottomAnchor, constant: 40),
             testButton.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             testButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-        ]) 
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -75,6 +100,8 @@ class MainView: UIView {
     }
     
     @objc private func testTouched() {
-        delegate?.handleTouchedUpTestButton()
+        viewDelegate?.handleTouchedUpTestButton()
     }
 }
+
+
