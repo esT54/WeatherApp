@@ -75,17 +75,38 @@ extension MainViewController: MainViewDelegate {
     func handleTouchedUpTestButton() {
         citiesArray = []
         guard let view = view as? MainView, let text = view.cityNameTextField.text else { return }
-        Network.share.requestToApi(api: Geocoder(cityName: text.replacingOccurrences(of: " ", with: ""))) { (data: [GeoCity]) in
-            self.citiesArray = data
-            self.citiesArray = Array(Set(self.citiesArray))
-            if self.citiesArray.count != 1 {
-                DispatchQueue.main.async {
-                    view.dropDownTableView.reloadData()
-                    view.selectHiddenTable(false)
+        Network.share.requestToApi(api: Geocoder(cityName: text.replacingOccurrences(of: " ", with: ""))) { (result: Result<[GeoCity], Error>) in
+            switch result {
+            case .success(let data):
+                self.citiesArray = data
+                self.citiesArray = Array(Set(self.citiesArray))
+                let a = self.citiesArray.count
+                switch a {
+                case 0:
+                    let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                    DispatchQueue.main.async {
+                        self.showSimpleAlert(title: "Error",
+                                        message: "Didn't find any cities with name: \(text)",
+                                        action: action,
+                                        viewController: self)
+                    }
+                case 1:
+                    if let city = self.citiesArray.first {
+                        self.getTemperature(city: city)
+                    }
+                default:
+                    DispatchQueue.main.async {
+                        view.dropDownTableView.reloadData()
+                        view.selectHiddenTable(false)
+                    }
                 }
-            } else {
-                if let city = self.citiesArray.first {
-                    self.getTemperature(city: city)
+            case .failure(let failure):
+                let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                DispatchQueue.main.async {
+                    self.showSimpleAlert(title: "Error",
+                                    message: String(describing: failure),
+                                    action: action,
+                                    viewController: self)
                 }
             }
         }
