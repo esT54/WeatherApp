@@ -12,4 +12,5 @@ struct Weather: Decodable {
     }
     let main: Main
     var base: String
+    var name: String
 }
