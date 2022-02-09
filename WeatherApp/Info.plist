@@ -24,5 +24,28 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict/>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array/>
+			<key>UTTypeDescription</key>
+			<string></string>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string></string>
+			<key>UTTypeReferenceURL</key>
+			<string></string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array/>
+				<key>public.mime-type</key>
+				<array/>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

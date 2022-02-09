@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 protocol MainViewDelegate {
     func handleTouchedUpTestButton()
+    func getCurrentLocation()
 }
 
 class MainView: UIView {
@@ -46,6 +47,16 @@ class MainView: UIView {
         return result
     }()
     
+    let getLocationButton: UIButton = {
+        let result = UIButton()
+        result.setTitle("get lock", for: .normal)
+        result.backgroundColor = .red
+        result.translatesAutoresizingMaskIntoConstraints = false
+        result.addTarget(self, action: #selector(getLockTouched), for: .touchUpInside)
+        return result
+    }()
+
+    
     let dropDownTableView: UITableView = {
         let result = UITableView(frame: .zero, style: .plain)
         result.translatesAutoresizingMaskIntoConstraints = false
@@ -77,6 +88,7 @@ class MainView: UIView {
         self.addSubview(cityNameStack)
         self.addSubview(responceLabel)
         self.addSubview(testButton)
+        self.addSubview(getLocationButton)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor, constant: 40),
@@ -92,6 +104,10 @@ class MainView: UIView {
             testButton.topAnchor.constraint(equalTo: responceLabel.bottomAnchor, constant: 40),
             testButton.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             testButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            
+            getLocationButton.topAnchor.constraint(equalTo: testButton.bottomAnchor, constant: 40),
+            getLocationButton.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            getLocationButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
         ])
     }
     
@@ -101,6 +117,10 @@ class MainView: UIView {
     
     @objc private func testTouched() {
         viewDelegate?.handleTouchedUpTestButton()
+    }
+    
+    @objc private func getLockTouched() {
+        viewDelegate?.getCurrentLocation()
     }
     
     func selectHiddenTable(_ hide: Bool) {

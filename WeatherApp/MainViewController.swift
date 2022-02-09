@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import CoreLocation
 
 class MainViewController: UIViewController {
     
+    var locationManager = CLLocationManager()
     var citiesArray = [GeoCity]()
 
     override func loadView() {
@@ -23,6 +25,12 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        locationManager = CLLocationManager()
+        locationManager.delegate = self
+//        locationManager.authorizationStatus
+        locationManager.requestWhenInUseAuthorization()
+//        locationManager.startUpdatingLocation()
+        
         if let view = view as? MainView {
             view.dropDownTableView.reloadData()
         }
@@ -68,10 +76,29 @@ class MainViewController: UIViewController {
         }
     deinit {
         NotificationCenter.default.removeObserver(self)
+        locationManager.stopUpdatingLocation()
     }
 }
 // MARK: MainViewDelegate
 extension MainViewController: MainViewDelegate {
+    func getCurrentLocation() {
+        if let location = locationManager.location {
+            let lat = Float(location.coordinate.latitude)
+            let lon = Float(location.coordinate.longitude)
+            
+            Network.share.requestToApi(api: WeatherApi(lat: lat, lon: lon)) { (data: Weather) in
+                let temp = String(format: "%.0f", data.main.temp - 273.15)
+                DispatchQueue.main.async {
+                    if let view = self.view as? MainView {
+                        view.selectHiddenTable(true)
+                        view.responceLabel.text = "Current temp = \(temp) °C"
+                        view.cityNameTextField.text = data.name
+                    }
+                }
+            }
+        }
+    }
+    
     func handleTouchedUpTestButton() {
         citiesArray = []
         guard let view = view as? MainView, let text = view.cityNameTextField.text else { return }
@@ -135,6 +162,12 @@ extension MainViewController: UITableViewDelegate {
         DispatchQueue.main.async {
             self.getTemperature(city: city)
         }
+    }
+}
+
+extension MainViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print(manager.location?.coordinate)
     }
 }
 
