@@ -25,17 +25,15 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        locationManager = CLLocationManager()
+
         locationManager.delegate = self
-//        locationManager.authorizationStatus
-        locationManager.requestWhenInUseAuthorization()
-//        locationManager.startUpdatingLocation()
+        getCurrentLocation()
         
         if let view = view as? MainView {
             view.dropDownTableView.reloadData()
         }
         self.hideKeyboardWhenTappedAround()
-//        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
@@ -63,13 +61,18 @@ class MainViewController: UIViewController {
         view.frame.origin.y = 0
     }
     
-    func getTemperature(city: GeoCity) {
-            Network.share.requestToApi(api: WeatherApi(lat: Int(city.lat), lon: Int(city.lon))) { (data: Weather) in
+    func getTemperature(lat: Float, lon: Float) {
+            Network.share.requestToApi(api: WeatherApi(lat: lat, lon: lon)) { (data: CurrentWeather) in
                 let temp = String(format: "%.0f", data.main.temp - 273.15)
+                let feelsLike = String(format: "%.0f", data.main.feels_like - 273.15)
                 DispatchQueue.main.async {
                     if let view = self.view as? MainView {
                         view.selectHiddenTable(true)
-                        view.responceLabel.text = "Current temp = \(temp) °C"
+                        view.tempLabel.text = "Temp = \(temp) °C"
+                        view.feelsLikeLabel.text = "Feels like: \(feelsLike) °C"
+                        if let sky = data.weather.first?.main {
+                            view.skyLabel.text = "Sky is \(sky)"
+                        }
                     }
                 }
             }
@@ -86,12 +89,17 @@ extension MainViewController: MainViewDelegate {
             let lat = Float(location.coordinate.latitude)
             let lon = Float(location.coordinate.longitude)
             
-            Network.share.requestToApi(api: WeatherApi(lat: lat, lon: lon)) { (data: Weather) in
+            Network.share.requestToApi(api: WeatherApi(lat: lat, lon: lon)) { (data: CurrentWeather) in
                 let temp = String(format: "%.0f", data.main.temp - 273.15)
+                let feelsLike = String(format: "%.0f", data.main.feels_like - 273.15)
                 DispatchQueue.main.async {
                     if let view = self.view as? MainView {
                         view.selectHiddenTable(true)
-                        view.responceLabel.text = "Current temp = \(temp) °C"
+                        view.tempLabel.text = "Temp: \(temp) °C"
+                        view.feelsLikeLabel.text = "Feels like: \(feelsLike) °C"
+                        if let sky = data.weather.first?.main {
+                            view.skyLabel.text = "Sky is \(sky)"
+                        }
                         view.cityNameTextField.text = data.name
                     }
                 }
@@ -119,7 +127,8 @@ extension MainViewController: MainViewDelegate {
                     }
                 case 1:
                     if let city = self.citiesArray.first {
-                        self.getTemperature(city: city)
+                        self.getTemperature(lat: Float(city.lat),
+                                            lon: Float(city.lon))
                     }
                 default:
                     DispatchQueue.main.async {
@@ -160,14 +169,16 @@ extension MainViewController: UITableViewDelegate {
             view.cityNameTextField.text = city.name + ", " + city.country
         }
         DispatchQueue.main.async {
-            self.getTemperature(city: city)
+            self.getTemperature(lat: Float(city.lat), lon: Float(city.lon))
         }
     }
 }
 
 extension MainViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print(manager.location?.coordinate)
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .notDetermined {
+            manager.requestWhenInUseAuthorization()
+        }
     }
 }
 

@@ -31,10 +31,24 @@ class MainView: UIView {
         return result
     }()
     
-    let responceLabel: UILabel = {
+    let tempLabel: UILabel = {
         let result = UILabel()
         result.translatesAutoresizingMaskIntoConstraints = false
         result.text = "Responce temputure"
+        return result
+    }()
+    
+    let feelsLikeLabel: UILabel = {
+        let result = UILabel()
+        result.translatesAutoresizingMaskIntoConstraints = false
+        result.text = "Feels like: "
+        return result
+    }()
+    
+    let skyLabel: UILabel = {
+        let result = UILabel()
+        result.translatesAutoresizingMaskIntoConstraints = false
+        result.text = "Sky: "
         return result
     }()
     
@@ -53,6 +67,7 @@ class MainView: UIView {
         result.backgroundColor = .red
         result.translatesAutoresizingMaskIntoConstraints = false
         result.addTarget(self, action: #selector(getLockTouched), for: .touchUpInside)
+        result.isHidden = true
         return result
     }()
 
@@ -86,7 +101,9 @@ class MainView: UIView {
         
         self.addSubview(titleLabel)
         self.addSubview(cityNameStack)
-        self.addSubview(responceLabel)
+        self.addSubview(tempLabel)
+        self.addSubview(feelsLikeLabel)
+        self.addSubview(skyLabel)
         self.addSubview(testButton)
         self.addSubview(getLocationButton)
         
@@ -98,10 +115,16 @@ class MainView: UIView {
             cityNameStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             cityNameStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
-            responceLabel.topAnchor.constraint(equalTo: cityNameStack.bottomAnchor, constant: 40),
-            responceLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            tempLabel.topAnchor.constraint(equalTo: cityNameStack.bottomAnchor, constant: 40),
+            tempLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             
-            testButton.topAnchor.constraint(equalTo: responceLabel.bottomAnchor, constant: 40),
+            feelsLikeLabel.topAnchor.constraint(equalTo: tempLabel.bottomAnchor, constant: 8),
+            feelsLikeLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            
+            skyLabel.topAnchor.constraint(equalTo: feelsLikeLabel.bottomAnchor, constant: 8),
+            skyLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            
+            testButton.topAnchor.constraint(equalTo: skyLabel.bottomAnchor, constant: 40),
             testButton.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             testButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             
