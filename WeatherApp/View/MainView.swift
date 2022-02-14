@@ -25,9 +25,23 @@ class MainView: UIView {
     }()
     
     let cityNameTextField: UITextField = {
+        let button = UIButton()
+        let searchImage = UIImage(systemName: "magnifyingglass")
+        
+        button.setImage(searchImage, for: .normal)
+        button.sizeToFit()
+        
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0,
+                                                bottom: 0, right: 8)
+        button.addTarget(self, action: #selector(testTouched), for: .touchUpInside)
+        
         let result = UITextField()
         result.translatesAutoresizingMaskIntoConstraints = false
         result.borderStyle = .roundedRect
+        result.rightView = button
+        result.rightViewMode = .whileEditing
+        
+        
         return result
     }()
     
@@ -58,6 +72,7 @@ class MainView: UIView {
         result.backgroundColor = .red
         result.translatesAutoresizingMaskIntoConstraints = false
         result.addTarget(self, action: #selector(testTouched), for: .touchUpInside)
+        result.isHidden = true
         return result
     }()
     
